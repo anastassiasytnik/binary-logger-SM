@@ -27,4 +27,5 @@
   	<url>scm:git:https://github.com:anastassiasytnik/binary-logger-SM.git</url>
   	<connection>scm:git:https://github.com:anastassiasytnik/binary-logger-SM.git</connection>
   </scm>
+  <description>Persist BinaryLoggable objects as byte arrays with maximum simplicity and read/write operations iterating on read.</description>
 </project>

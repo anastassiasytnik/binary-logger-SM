@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import homework.binary_logger_SM.BinaryLoggable;
 
 /******************************************************************************
  * An implementation of BinaryLogger that uses FileOutputStream.
@@ -21,21 +22,16 @@ import java.util.List;
  *                      which is the result of calling the toBytes() method 
  *   then there's a string (as bytes) that is the class name,
  *   and finally there's the byte data.
- *   
- * During the writing the data in the file is indexed by different classes.                                            
- * So if you instantiated FileBinaryLogger<BinaryLoggable>, but use it
- * to save 3 different implementations of BinaryLoggable - then you can 
- * call {@link #read(Class<T>)} on any of the implementations, and 
- * get the iterator that returns only that implementation.
- * TODO test if that last statement even possible, adjust if needed.
+ *
+ * WARNING: when this class is closed the iterators
+ * issued with the method {@link #read()} remain open,
+ * and it is the caller's responsibility to close those.
+ * (Since the read can be continued after the write is done).
  */
 public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> {
   
   /** to write to the file */
   protected FileOutputStream output = null;
-
-  /** to be able to read (FAST) only the certain sub-type. */
-  protected HashMap<String, List<Long>> typeMap = new HashMap<String, List<Long>>();
 
   /** amount of bytes already written */
   protected long position = 0L;
@@ -127,16 +123,10 @@ public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> 
     this.output.write(data);
     this.output.flush();
     this.position += FileBinaryReader.TWO_INTEGERS + nameLen + data.length;
-    List<Long> crumbs = this.typeMap.get(className);
-    if (null == crumbs) {
-      crumbs = new ArrayList<Long>();
-      this.typeMap.put(className, crumbs);
-    }
-    crumbs.add(position);
   }
 
   @Override
-  Iterator<T> read(Class<T> clazz) throws IOException {
+  Iterator<T> read() throws IOException {
     // TODO Auto-generated method stub
     return null;
   }

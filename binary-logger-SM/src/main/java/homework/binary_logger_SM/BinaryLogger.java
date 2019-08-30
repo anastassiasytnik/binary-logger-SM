@@ -28,9 +28,11 @@ public abstract class BinaryLogger<T extends BinaryLoggable> implements AutoClos
   /**
   * Read and iterate through instances persisted in the given file.
   *
-  * @param clazz a class of the type T, clazz should have a public no-arg constructor
+  * WARNING: a class of the type T  should have a public no-arguments constructor
+  * or NoSuchMethodException will be thrown on attempt to read.
+  *
   * @throws IOException if any IO operation fails
   */
-  abstract Iterator<T> read(Class<T> clazz) throws IOException;
+  abstract Iterator<T> read() throws IOException;
 }
 

@@ -31,8 +31,6 @@ import java.util.List;
  */
 public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> {
   
-  protected final static int TWO_INTEGERS = Integer.BYTES * 2;
-  
   /** to write to the file */
   protected FileOutputStream output = null;
 
@@ -121,14 +119,14 @@ public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> 
     byte[] nameBytes = className.getBytes(StandardCharsets.UTF_8);
     int nameLen = nameBytes.length - 2;
     byte[] data = loggable.toBytes();
-    byte[] numbers = new byte[TWO_INTEGERS];
+    byte[] numbers = new byte[FileBinaryReader.TWO_INTEGERS];
     intToBytes(nameLen, numbers, 0);
     intToBytes(data.length, numbers, Integer.BYTES);
     this.output.write(numbers);
     this.output.write(nameBytes, 2, nameLen);
     this.output.write(data);
     this.output.flush();
-    this.position += TWO_INTEGERS + nameLen + data.length;
+    this.position += FileBinaryReader.TWO_INTEGERS + nameLen + data.length;
     List<Long> crumbs = this.typeMap.get(className);
     if (null == crumbs) {
       crumbs = new ArrayList<Long>();
@@ -164,30 +162,6 @@ public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> 
     buffer[offset + 2] = (byte) (value >>>  8);
     buffer[offset + 1] = (byte) (value >>> 16);
     buffer[offset    ] = (byte) (value >>> 24);
-  }
-
-  /****************************************************************************
-   * Reads the integer from byte array buffer.
-   *
-   * This method is stolen from java.io.Bits.getInt().
-   * Unfortunately both the method and the class are not visible or could call.
-   *
-   * WARNING: this method is not fool-proof for speed. Please use with care:
-   * make sure the offset is at least 4 positions from the end of the buffer.
-   * (4 == Integer.BYTES)
-   *
-   * @param buffer - the byte array containing integer in question.
-   *       Make sure it's not null and at least Integer.BYTES long.
-   * @param offset - the position in the buffer where the integer starts.
-   *       Make sure the offset is at least buffer.length - Integer.BYTES
-   *
-   * @return the value of the integer.
-   */
-  public static int bytesToInt(byte[] buffer, int offset) {
-    return ((buffer[offset + 3] & 0xFF)      ) +
-           ((buffer[offset + 2] & 0xFF) <<  8) +
-           ((buffer[offset + 1] & 0xFF) << 16) +
-           ((buffer[offset    ]       ) << 24);
   }
 
 }

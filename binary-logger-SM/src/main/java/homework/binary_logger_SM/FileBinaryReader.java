@@ -138,8 +138,8 @@ public class FileBinaryReader<T extends BinaryLoggable> implements Iterator<T>, 
       if (TWO_INTEGERS > actual) {
         throw new IOException(PREMATURE_EOF);
       }
-      int nameLen = bytesToInt(numbers, 0);
-      dataLen = bytesToInt(numbers, Integer.BYTES);
+      int nameLen = Util.bytesToInt(numbers, 0);
+      dataLen = Util.bytesToInt(numbers, Integer.BYTES);
 
       // Read the class name next.
       byte[] nameBytes = new byte[nameLen];

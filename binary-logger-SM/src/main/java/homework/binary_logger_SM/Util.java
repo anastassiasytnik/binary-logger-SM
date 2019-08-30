@@ -10,7 +10,7 @@ public class Util {
    *
    * This method is stolen from java.io.Bits.getInt().
    * Unfortunately both the method and the class are not visible or could call.
-   *
+   * <p>
    * WARNING: this method is not fool-proof for speed. Please use with care:
    * make sure the offset is at least 4 positions from the end of the buffer.
    * (4 == Integer.BYTES)
@@ -34,7 +34,7 @@ public class Util {
    *
    * This method is stolen from java.io.Bits.putInt().
    * Unfortunately both the method and the class are not visible or could call.
-   *
+   * <p>
    * WARNING: this method is not fool-proof for speed. Please use with care:
    * make sure the buffer length is sufficient and the offset is at least
    * 4 positions from the end of the buffer.

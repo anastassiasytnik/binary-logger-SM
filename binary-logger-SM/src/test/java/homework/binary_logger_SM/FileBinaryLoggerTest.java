@@ -21,8 +21,4 @@ public class FileBinaryLoggerTest extends TestCase {
     fail("Not yet implemented");
   }
 
-  public void testIntToBytes() {
-    fail("Not yet implemented");
-  }
-
 }

@@ -5,10 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import homework.binary_logger_SM.BinaryLoggable;
 
 /******************************************************************************
@@ -38,15 +35,15 @@ public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> 
 
   /****************************************************************************
    * Checks whether the provided file exists, readable and writable.
-   * 
+   *
    * If not - tries to amend the situation. Prepares for the file for writing.
    * Initializes the types map.
-   * 
+   *
    * @param file - file to write to.
-   * 
+   *
    * @throws IllegalArgumentException - if the parameter is null
    * @throws FileNotFoundException - if file is not located after
-   *    it has been checked out good. 
+   *    it has been checked out good.
    * @throws IOException -if file doesn't exists and cannot be created,
    *      or if the file permissions prevent logger from doing the work.
    */

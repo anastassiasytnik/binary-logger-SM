@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
-import java.util.List;
 
 /******************************************************************************
  * This class will read from the file created by {@link FileBinaryLogger}
@@ -31,7 +30,23 @@ public class FileBinaryReader<T extends BinaryLoggable> implements Iterator<T>, 
   protected T next = null;
   protected String nameT;
   
-  
+  /****************************************************************************
+   * checks the arguments and reads the first element of type T.
+   *
+   * The checks are:
+   *  - that the file exists
+   *  - that the class name belongs to BinaryLoggable type of T
+   *  - that the class with the provided name has with 0-parameters constructor;
+   *
+   * @param tClassName - the name of the class T (impossible to get otherwise).
+   * @param file - the file to read from
+   *
+   * @throws IllegalArgumentException - if any of the checks fail
+   * @throws IOException - if can't read from the file.
+   * @throws ClassNotFoundException - if there's no such class as tClassName
+   *
+   * TODO handle the case where the file doesn't contain type T at all
+   */
   public FileBinaryReader(String tClassName, File file) throws IllegalArgumentException, IOException, ClassNotFoundException {
     if (null == file) {
       throw new IllegalArgumentException("No input file provided");
@@ -51,8 +66,27 @@ public class FileBinaryReader<T extends BinaryLoggable> implements Iterator<T>, 
       }
     }
     this.inputFile = file;
+
     // Check that the name is correct
-    Class.forName(tClassName);
+    Class<?> tClass = Class.forName(tClassName);
+    // Java refuses to do instanceof check on T, Class<?> variable or Class.forName().
+    // So do try the exception way.
+    try {
+      Object testInstance = tClass.getConstructor().newInstance();
+      @SuppressWarnings("unused")
+      BinaryLoggable testIterface = (BinaryLoggable) testInstance;
+      @SuppressWarnings({ "unchecked", "unused" })
+      T testType = (T) testInstance;
+    } catch (Exception e) {
+      //TODO differentiate with friendly user message
+      throw new IllegalArgumentException(
+          "Class " + tClassName
+          + " either isn't BinaryLoggale"
+          + "or isn't the T type"
+          + " or doesn't have 0-param constructor or something"
+      );
+    }
+
     this.nameT = tClassName;
 
     // Try to read next so we would know if there's anything there.
@@ -65,16 +99,20 @@ public class FileBinaryReader<T extends BinaryLoggable> implements Iterator<T>, 
   }
 
   /****************************************************************************
-   * 
+   * reads the file until either the end is reached or the element of type
+   * this.nameT is found or an IOException occurs.
+   *
    * @return T - the next element of type T if possible.
-   * @throws IOException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
-   * @throws IllegalArgumentException
+   *
+   * @throws IOException - if can't read from the file
+   * @throws InstantiationException - if can't create object from the file.
+   * @throws IllegalAccessException - if the 0-param constructor isn't public
+   * @throws IllegalArgumentException - most likely NoSuchMethod would happen.
    * @throws InvocationTargetException
-   * @throws NoSuchMethodException
-   * @throws SecurityException
-   * @throws ClassNotFoundException
+   *                      - the constructor of the object thrown exception
+   * @throws NoSuchMethodException - object has no 0-param constructor
+   * @throws SecurityException - problems with classLoader
+   * @throws ClassNotFoundException - don't have code for the persisted class
    */
   @SuppressWarnings("unchecked")
   protected T read() 
@@ -146,6 +184,12 @@ public class FileBinaryReader<T extends BinaryLoggable> implements Iterator<T>, 
     return this.next;
   }
 
+  /**
+   * open the file if it isn't yet opened, skip to currentPosition.
+   *
+   * @throws FileNotFoundException - the file got lost since constructor
+   * @throws IOException - can't skip bytes in the file.
+   */
   protected void positionReader() throws FileNotFoundException, IOException {
     if (null == this.input) {
       this.input = new FileInputStream(this.inputFile);
@@ -156,6 +200,9 @@ public class FileBinaryReader<T extends BinaryLoggable> implements Iterator<T>, 
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public boolean hasNext() {
     return (null != this.next);
   }

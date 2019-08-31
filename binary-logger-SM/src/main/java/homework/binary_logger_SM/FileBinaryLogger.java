@@ -123,9 +123,18 @@ public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> 
   }
 
   @Override
-  Iterator<T> read() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+  Iterator<T> read(String className) throws IllegalArgumentException, IOException {
+    Iterator<T> result = null;
+    try {
+      result = (Iterator<T>) new FileBinaryReader<T>(className, this.outputFile);
+    } catch (IOException ioe ) {
+      // throw IO "as is"
+      throw ioe;
+    } catch (Exception e) {
+      // throw the rest as illegal argument, cause it is.
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+    return result;
   }
 
 }

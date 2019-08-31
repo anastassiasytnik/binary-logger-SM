@@ -138,8 +138,8 @@ public class FileBinaryReader<T extends BinaryLoggable> implements Iterator<T>, 
       if (TWO_INTEGERS > actual) {
         throw new IOException(PREMATURE_EOF);
       }
-      int nameLen = bytesToInt(numbers, 0);
-      dataLen = bytesToInt(numbers, Integer.BYTES);
+      int nameLen = Util.bytesToInt(numbers, 0);
+      dataLen = Util.bytesToInt(numbers, Integer.BYTES);
 
       // Read the class name next.
       byte[] nameBytes = new byte[nameLen];
@@ -233,30 +233,6 @@ public class FileBinaryReader<T extends BinaryLoggable> implements Iterator<T>, 
     } catch (IOException e) {
       throw new IOException("Couldn't close input stream.", e);
     }
-  }
-
-  /****************************************************************************
-   * Reads the integer from byte array buffer.
-   *
-   * This method is stolen from java.io.Bits.getInt().
-   * Unfortunately both the method and the class are not visible or could call.
-   *
-   * WARNING: this method is not fool-proof for speed. Please use with care:
-   * make sure the offset is at least 4 positions from the end of the buffer.
-   * (4 == Integer.BYTES)
-   *
-   * @param buffer - the byte array containing integer in question.
-   *       Make sure it's not null and at least Integer.BYTES long.
-   * @param offset - the position in the buffer where the integer starts.
-   *       Make sure the offset is at least buffer.length - Integer.BYTES
-   *
-   * @return the value of the integer.
-   */
-  public static int bytesToInt(byte[] buffer, int offset) {
-    return ((buffer[offset + 3] & 0xFF)      ) +
-           ((buffer[offset + 2] & 0xFF) <<  8) +
-           ((buffer[offset + 1] & 0xFF) << 16) +
-           ((buffer[offset    ]       ) << 24);
   }
 
 }

@@ -113,8 +113,8 @@ public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> 
     int nameLen = nameBytes.length - 2;
     byte[] data = loggable.toBytes();
     byte[] numbers = new byte[FileBinaryReader.TWO_INTEGERS];
-    intToBytes(nameLen, numbers, 0);
-    intToBytes(data.length, numbers, Integer.BYTES);
+    Util.intToBytes(nameLen, numbers, 0);
+    Util.intToBytes(data.length, numbers, Integer.BYTES);
     this.output.write(numbers);
     this.output.write(nameBytes, 2, nameLen);
     this.output.write(data);
@@ -123,32 +123,18 @@ public class FileBinaryLogger<T extends BinaryLoggable> extends BinaryLogger<T> 
   }
 
   @Override
-  Iterator<T> read() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /****************************************************************************
-   * Converts an integer to a byte array.
-   *
-   * This method is stolen from java.io.Bits.putInt().
-   * Unfortunately both the method and the class are not visible or could call.
-   *
-   * WARNING: this method is not fool-proof for speed. Please use with care:
-   * make sure the buffer length is sufficient and the offset is at least
-   * 4 positions from the end of the buffer.
-   *
-   * @param value - the integer to convert to bytes
-   * @param buffer - the byte array to put the converted integer to.
-   *     Make sure it's not null and at least Integer.BYTES long.
-   * @param offset - the offset from which the converted integer should start.
-   *       Make sure the offset is at least buffer.length - Integer.BYTES
-   */
-  public static void intToBytes(int value, byte[] buffer, int offset) {
-    buffer[offset + 3] = (byte) (value       );
-    buffer[offset + 2] = (byte) (value >>>  8);
-    buffer[offset + 1] = (byte) (value >>> 16);
-    buffer[offset    ] = (byte) (value >>> 24);
+  Iterator<T> read(String className) throws IllegalArgumentException, IOException {
+    Iterator<T> result = null;
+    try {
+      result = (Iterator<T>) new FileBinaryReader<T>(className, this.outputFile);
+    } catch (IOException ioe ) {
+      // throw IO "as is"
+      throw ioe;
+    } catch (Exception e) {
+      // throw the rest as illegal argument, cause it is.
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+    return result;
   }
 
 }

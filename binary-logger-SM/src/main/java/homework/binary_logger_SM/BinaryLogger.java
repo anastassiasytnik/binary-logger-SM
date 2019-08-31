@@ -31,8 +31,11 @@ public abstract class BinaryLogger<T extends BinaryLoggable> implements AutoClos
   * WARNING: a class of the type T  should have a public no-arguments constructor
   * or NoSuchMethodException will be thrown on attempt to read.
   *
+  * @param className - name of the class that is of T type
+  *                      and has 0-arg constructor
+  *
   * @throws IOException if any IO operation fails
   */
-  abstract Iterator<T> read() throws IOException;
+  abstract Iterator<T> read(String className) throws IOException;
 }
 
